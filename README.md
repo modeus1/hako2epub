@@ -13,6 +13,8 @@
     ·
     <a href="https://github.com/quantrancse/hako2epub/releases/latest/download/hako2epub.apk">Android</a>
     ·
+    <a href="#browser-extension">Browser extension</a>
+    ·
     <a href="#screenshots">Screenshots</a>
     ·
     <a href="#usage">Script Usage</a>
@@ -28,11 +30,11 @@
 
 - [Table of Contents](#table-of-contents)
 - [About The Project](#about-the-project)
-  - [Features](#features)
-- [Getting Started](#getting-started)
+  - [Features](#features)  - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Usage](#usage)
   - [Notes](#notes)
+  - [Browser Extension](#browser-extension)
 - [Screenshots](#screenshots)
 - [Issues](#issues)
 - [Contributing](#contributing)
@@ -68,6 +70,7 @@ A tool to download light novels from [ln.hako.vn](https://ln.hako.vn) in epub fi
 * Automatic retry on network failures.
 * **Dual download modes**: Fast mode for speed, Slow mode for reliability with Cloudflare protection.
 * **Android app**: the same downloader as an APK, saving into `Downloads/hako2epub`.
+* **Browser extension**: the same downloader as a Chrome/Edge/Brave extension, running fully in the browser (see [Browser Extension](#browser-extension)).
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -156,7 +159,46 @@ python hako2epub.py -d
 * Deleting asks which light novels first, then which of their volumes to remove. Selecting every volume of a light novel also removes its folder and its `ln_info.json` entry.
 * The Android app writes the same `ln_info.json` format, but names folders and files differently (`Tap-1-Novel.epub` here vs `Tap 1 - Novel.epub` on Android), so a library copied between the two will be re-downloaded rather than recognised.
 
+## Browser Extension
+
+The `extension/` folder is a Manifest V3 port of this tool: no Python, no Playwright and no build step. Page parsing, protected-chapter decoding and EPUB creation all happen in the browser, and the finished `.epub` is saved through the browser's download manager.
+
+### Install (unpacked)
+1. Open `chrome://extensions` (Edge: `edge://extensions`, Brave: `brave://extensions`).
+2. Enable **Developer mode**.
+3. Click **Load unpacked** and select the `extension/` folder of this repository.
+4. Pin the hako2epub icon to the toolbar.
+
+### Usage
+* The extension never opens a separate tab. On a novel page a **Download EPUB** button in the bottom-right corner opens the interface in a side panel over the page, with that novel already loaded; the toolbar icon and the right-click menu open the same panel. Chapter pages and other pages get no button.
+* The panel does one thing: download. Pick volumes, optionally narrow each volume to a chapter range, then press **Download EPUB**. Files are saved to `Downloads/hako2epub/<novel>/<volume>-<novel>.epub` using the same names as the desktop tool.
+* It is the only UI: there is no library, update or settings screen, and the panel fits phone-width screens (full-width sheet, scrollable volume table).
+
+### Extension Notes
+* Requests use your browser session for the supported domains. If Cloudflare blocks the page, open it in a tab once and retry.
+* Chapter images live on many third-party hosts, so the extension asks for optional access to the sites you download from (`*://*/*`). Without it, EPUBs are still created, just without images.
+* Protected (`xor_shuffle`) chapters are decoded locally, so no headless browser is needed.
+* Rendered chapters are cached in RAM first (instant re-use while the tab is open), and mirrored to IndexedDB so a download that is interrupted — or a browser restart — resumes where it stopped instead of refetching.
+* Requests are paced adaptively: a steady cadence, a global pause honouring the site's `Retry-After` on HTTP 429, and a gradual speed-up after a run of successes.
+* Keep the page open while a download runs; the panel lives inside that tab.
+
+### Extension Tests
+`extension/tests` contains Node tests for the parsers, settings and the EPUB writer, plus a real-browser smoke test:
+```sh
+cd extension/tests
+npm install
+npx puppeteer browsers install chrome   # npm 11+ blocks puppeteer's install script
+npm test        # parsers, XOR decode, image/note handling, EPUB writer, library
+npm run smoke   # loads the unpacked extension into Chromium and drives the real UI
+```
+
+The smoke test needs the system libraries a normal Chromium install uses (`libnss3`, `libatk`, `libcairo`, `libasound`, …). It serves `tests/fixtures` through request interception because the live sites reject automated clients, then asserts what the browser really produced: the MV3 service worker, the EPUB bytes in `chrome.downloads`, the `chrome.storage.local` records, update detection, export and file deletion.
+
 ## Screenshots
+**Browser extension**
+
+![Browser extension](images/extension.png)
+
 **Windows**
 
 ![Demo](images/demo.png)

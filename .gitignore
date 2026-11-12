@@ -21,3 +21,12 @@ venv/
 ln_info.json
 *.log
 .DS_Store
+
+# Browser extension tests / local artifacts
+node_modules/
+extension/tests/.output/
+artifacts/
+.chrome-libs/
+
+# Third-party extension kept only as a local reference
+reference/

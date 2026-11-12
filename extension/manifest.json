@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "hako2epub",
+  "version": "2.7.0",
+  "description": "Download light novels from ln.hako.vn, docln.net and docln.sbs as EPUB files from an in-page panel.",
+  "homepage_url": "https://github.com/quantrancse/hako2epub",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "hako2epub",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "downloads",
+    "storage",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://ln.hako.vn/*",
+    "https://docln.net/*",
+    "https://docln.sbs/*"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ln.hako.vn/*",
+        "https://docln.net/*",
+        "https://docln.sbs/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "app.html",
+        "app.css",
+        "app.js",
+        "src/*.js",
+        "icons/*"
+      ],
+      "matches": [
+        "https://ln.hako.vn/*",
+        "https://docln.net/*",
+        "https://docln.sbs/*"
+      ]
+    }
+  ]
+}

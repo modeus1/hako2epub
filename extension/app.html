@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hako2epub</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img src="icons/icon48.png" alt="" width="36" height="36">
+    <div>
+      <h1>hako2epub</h1>
+      <p class="sub">Light novels &rarr; EPUB</p>
+    </div>
+  </div>
+  <span class="badge" id="versionBadge">v2.7.0</span>
+</header>
+
+<main>
+  <form id="loadForm" class="url-form" autocomplete="off">
+    <input id="novelUrl" type="text" placeholder="https://ln.hako.vn/truyen/..." spellcheck="false">
+    <button type="submit" id="loadBtn" class="primary">Load</button>
+  </form>
+
+  <div id="novelView" class="hidden"></div>
+
+  <div class="card">
+    <div class="row between wrap">
+      <h2 id="activityTitle">Activity</h2>
+      <div class="row">
+        <button id="cancelBtn" class="ghost hidden" type="button">Cancel</button>
+        <button id="clearLogBtn" class="ghost" type="button">Clear log</button>
+      </div>
+    </div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-text">
+      <span id="progressText">Idle</span>
+      <span id="progressCount"></span>
+    </div>
+    <pre id="log" class="log" aria-live="polite"></pre>
+  </div>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
